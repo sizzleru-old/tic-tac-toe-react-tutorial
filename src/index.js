@@ -84,7 +84,14 @@ class Game extends React.Component {
         : "Go to game start";
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button
+            onClick={() => this.jumpTo(move)}
+            style={{
+              "font-weight": isCurrentMove(move, this.state.stepNumber),
+            }}
+          >
+            {desc}
+          </button>
         </li>
       );
     });
@@ -139,4 +146,8 @@ function calculateWinner(squares) {
 
 function mapToColAndRow(index) {
   return "(" + ((index % 3) + 1) + ", " + (Math.round(index / 3) + 1) + ")";
+}
+
+function isCurrentMove(move, stepNumber) {
+  return move === stepNumber ? "bold" : "normal";
 }
