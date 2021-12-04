@@ -20,25 +20,27 @@ class Board extends React.Component {
     );
   }
 
+  renderBoard(i) {
+    return (
+      <div className="board-row">
+        {[...Array(i).keys()].map((row) => this.renderSquare(row))}
+      </div>
+    );
+  }
+
   render() {
+    const rowLength = 3;
+    const colLength = 3;
     return (
       <div>
         <div className="status"></div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
+        {[...Array(rowLength).keys()].map((row) => (
+          <div className="board-row">
+            {[...Array(colLength).keys()].map((col) =>
+              this.renderSquare(row * rowLength + col)
+            )}
+          </div>
+        ))}
       </div>
     );
   }
@@ -48,7 +50,7 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      history: [{ squares: Array(9).fill(null) }],
+      history: [{ squares: Array(9).fill(null), change: null }],
       stepNumber: 0,
       xIsNext: true,
     };
@@ -63,7 +65,7 @@ class Game extends React.Component {
     }
     squares[i] = this.state.xIsNext ? "X" : "O";
     this.setState({
-      history: history.concat([{ squares: squares }]),
+      history: history.concat([{ squares: squares, change: i }]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
     });
@@ -79,10 +81,19 @@ class Game extends React.Component {
     const winner = calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
-      const desc = move ? "Go to move#" + move : "Go to game start";
+      const desc = move
+        ? "Go to move#" + move + ", " + mapToColAndRow(step.change)
+        : "Go to game start";
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button
+            onClick={() => this.jumpTo(move)}
+            style={{
+              "font-weight": isCurrentMove(move, this.state.stepNumber),
+            }}
+          >
+            {desc}
+          </button>
         </li>
       );
     });
@@ -133,4 +144,12 @@ function calculateWinner(squares) {
     }
   }
   return null;
+}
+
+function mapToColAndRow(index) {
+  return "(" + ((index % 3) + 1) + ", " + (Math.round(index / 3) + 1) + ")";
+}
+
+function isCurrentMove(move, stepNumber) {
+  return move === stepNumber ? "bold" : "normal";
 }
