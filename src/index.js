@@ -4,7 +4,11 @@ import "./index.css";
 
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
+    <button
+      style={{ backgroundColor: props.winningSquare ? "blue" : null }}
+      className="square"
+      onClick={props.onClick}
+    >
       {props.value}
     </button>
   );
@@ -16,6 +20,7 @@ class Board extends React.Component {
       <Square
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
+        winningSquare={isWinningSquare(this.props.squares, i)}
       />
     );
   }
@@ -162,4 +167,29 @@ function mapToColAndRow(index) {
 
 function isCurrentMove(move, stepNumber) {
   return move === stepNumber ? "bold" : "normal";
+}
+
+function isWinningSquare(squares, square) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (
+      squares[a] &&
+      squares[a] === squares[b] &&
+      squares[a] === squares[c] &&
+      [a, b, c].indexOf(square) != -1
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
